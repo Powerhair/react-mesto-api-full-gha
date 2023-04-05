@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://api.lostgeneration.nomoredomains.work/';
+export const BASE_URL = 'https://api.lostgeneration.nomoredomains.work';
 
 function checkResponse(res) {
   if (res.ok) {
