@@ -185,7 +185,7 @@ function App() {
     api
       .postUserCard(data)
       .then((newCard) => {
-        setCards([newCard, ...cards]);
+        setCards([ ...cards, newCard]);
         closeAllPopups();
       })
       .catch((err) => {
@@ -197,7 +197,7 @@ function App() {
   }
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i === currentUser._id);
     if (!isLiked) {
       api
         .addLike(card._id, !isLiked)

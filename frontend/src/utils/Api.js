@@ -1,88 +1,120 @@
 class Api {
-  constructor({ url, headers }) {
-    this._url = url;
-    this._headers = headers;
-  }
+  constructor( {baseUrl}) {
+    this._baseUrl = baseUrl;
 
-  _checkRequest(res) {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject('error');
-    }
+    this.__checkResponse = (res) => {
+      if (res.ok) {
+        return res.json();
+      }
+      return Promise.reject(`Ошибка: ${res.status}`);
+    };
   }
 
   getUserInfo() {
-    return fetch(`${this._url}users/me`, {
-      method: 'GET',
-      headers: this._headers,
-    }).then(this._checkRequest);
+    const token = localStorage.getItem('jwt');
+    return fetch(this._baseUrl + `/users/me`, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    }).then(this.__checkResponse);
   }
 
   getInitialCards() {
-    return fetch(`${this._url}cards`, {
-      method: 'GET',
-      headers: this._headers,
-    }).then(this._checkRequest);
+    const token = localStorage.getItem('jwt');
+    return fetch(this._baseUrl + `/cards`, {
+      method: 'Get',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    .then(this.__checkResponse);
   }
 
-  getData() {
-    return Promise.all([this.getUserInfo(), this.getInitialCards()]);
-  }
-
-  getUserAvatar(avatar) {
-    return fetch(`${this._url}users/me/avatar`, {
-      method: 'PATCH',
-      headers: this._headers,
-      body: JSON.stringify(avatar),
-    }).then(this._checkRequest);
-  }
-
-  setUserInfo(data) {
-    return fetch(`${this._url}users/me`, {
-      method: 'PATCH',
-      headers: this._headers,
-      body: JSON.stringify(data),
-    }).then(this._checkRequest);
-  }
 
   postUserCard(data) {
-    return fetch(`${this._url}cards`, {
+    const token = localStorage.getItem('jwt');
+    return fetch(this._baseUrl + `/cards`, {
       method: 'POST',
-      headers: this._headers,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
       body: JSON.stringify(data),
-    }).then(this._checkRequest);
+    })
+    .then(this.__checkResponse);
   }
 
-  addLike(likeId) {
-    return fetch(`${this._url}cards/${likeId}/likes`, {
-      method: 'PUT',
-      headers: this._headers,
-    }).then(this._checkRequest);
+
+  setUserInfo(userInformaiton) {
+   console.log(userInformaiton)
+    return fetch(this._baseUrl + '/users/me', {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(userInformaiton)
+    })
+      .then(this.__checkResponse);
   }
 
-  removeLike(likeId) {
-    return fetch(`${this._url}cards/${likeId}/likes`, {
-      method: 'DELETE',
-      headers: this._headers,
-    }).then(this._checkRequest);
+  getUserAvatar(data) {
+    console.log(data)
+    return fetch(`${this._baseUrl}/users/me/avatar`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        avatar: data.avatar
+      })
+    })
+      .then(this.__checkResponse);
   }
+
 
   removeCard(cardId) {
-    return fetch(`${this._url}cards/${cardId}`, {
+    const token = localStorage.getItem('jwt');
+    return fetch(this._baseUrl + '/cards/' + cardId, {
       method: 'DELETE',
-      headers: this._headers,
-    }).then(this._checkRequest);
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      })
+      .then(this.__checkResponse);
+  }
+
+  addLike(cardId) {
+    const token = localStorage.getItem('jwt');
+    return fetch(this._baseUrl + '/cards/' + cardId + '/likes', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      })
+      .then(this.__checkResponse);
+  }
+
+  removeLike(cardId) {
+    const token = localStorage.getItem('jwt');
+    return fetch(this._baseUrl + '/cards/' + cardId + '/likes', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      })
+      .then(this.__checkResponse);
   }
 }
 
-const options = {
-  link: 'https://lostgeneration.nomoredomains.work',
-  headers: {
-    authorization: `Bearer ${localStorage.getItem('jwt')}`,
-    'Content-Type': 'application/json',
-    'Origin': 'https://lostgeneration.nomoredomains.work'
-  }
-}
-
-export const api = new Api(options);
+export const api = new Api({
+baseUrl: 'https://api.lostgeneration.nomoredomains.work'
+//  baseUrl: 'http://127.0.0.1:3000',
+});

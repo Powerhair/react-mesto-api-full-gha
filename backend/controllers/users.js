@@ -9,7 +9,7 @@ const User = require('../models/user');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(200).send({ data: users }))
+    .then((user) => res.status(200).send(user))
     .catch(next);
 };
 
@@ -70,13 +70,15 @@ module.exports.updateUser = (req, res, next) => {
 module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
-    .orFail(() => {
-      throw new NotFound('Пользователь с указанным _id не найден');
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('пользователя с несуществующим в БД id');
+      }
+      return res.send(user);
     })
-    .then((updatedAvatar) => res.status(200).send(updatedAvatar))
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequest('Переданы некорректные данные пользователя'));
+      if (err.name === 'ValidationError') {
+        next(new BadRequest('Переданы некорректные данные при создании пользователя'));
       } else {
         next(err);
       }
