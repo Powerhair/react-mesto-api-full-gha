@@ -12,4 +12,4 @@ IP 158.160.61.145
 
 Frontend https://lostgeneration.nomoredomains.work
 
-Backend https://api.lostgeneration.nomoredomains.work
+Backend https://api.lostgeneration.stud.nomoredomains.work
