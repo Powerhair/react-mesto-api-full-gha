@@ -115,6 +115,6 @@ class Api {
 }
 
 export const api = new Api({
-baseUrl: 'https://api.lostgeneration.nomoredomains.work'
+baseUrl: 'http://api.lostgeneration.nomoredomains.work'
 //  baseUrl: 'http://127.0.0.1:3000',
 });
